@@ -7,6 +7,7 @@ export function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState<"librarian" | "super_admin">("librarian");
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [submitting, setSubmitting] = useState(false);
   const { register } = useAuth();
@@ -17,7 +18,7 @@ export function Register() {
     setErrors({});
     setSubmitting(true);
     try {
-      const { user } = await register(name, email, password);
+      const { user } = await register(name, email, password, role);
       nav(user?.role === "super_admin" || user?.role === "librarian" ? "/dashboard" : "/dashboard", { replace: true });
     } catch (e: any) {
       if (e?.status === 422 && e?.body?.errors) {
@@ -44,8 +45,8 @@ export function Register() {
           className="space-y-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm"
         >
           <div>
-            <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Create your account</h1>
-            <p className="text-sm text-slate-500 mt-1">Join the library management system.</p>
+            <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Create staff account</h1>
+            <p className="text-sm text-slate-500 mt-1">Register a librarian or admin account.</p>
           </div>
 
           {errors._form && (
@@ -55,7 +56,7 @@ export function Register() {
           )}
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Name</label>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Full Name</label>
             <input
               required
               value={name}
@@ -91,6 +92,19 @@ export function Register() {
               placeholder="Min 8 characters"
             />
             {fieldError("password") && <p className="text-xs text-red-600 mt-1">{fieldError("password")}</p>}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Role</label>
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value as "librarian" | "super_admin")}
+              className="w-full rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+            >
+              <option value="librarian">Librarian</option>
+              <option value="super_admin">Super Admin</option>
+            </select>
+            {fieldError("role") && <p className="text-xs text-red-600 mt-1">{fieldError("role")}</p>}
           </div>
 
           <button

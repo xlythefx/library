@@ -17,7 +17,7 @@ interface AuthState {
 
 interface AuthContextValue extends AuthState {
   login: (email: string, password: string) => Promise<{ user: User }>;
-  register: (name: string, email: string, password: string) => Promise<{ user: User }>;
+  register: (name: string, email: string, password: string, role: 'super_admin' | 'librarian') => Promise<{ user: User }>;
   logout: () => Promise<void>;
   me: () => Promise<void>;
 }
@@ -49,8 +49,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { user: res.user };
   };
 
-  const register = async (name: string, email: string, password: string) => {
-    const res = await apiPost<{ token: string; user: User }>('/register', { name, email, password });
+  const register = async (name: string, email: string, password: string, role: 'super_admin' | 'librarian') => {
+    const res = await apiPost<{ token: string; user: User }>('/register', { name, email, password, role });
     localStorage.setItem('token', res.token);
     setState({ user: res.user, token: res.token, loading: false });
     return { user: res.user };
